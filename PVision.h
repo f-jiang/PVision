@@ -23,15 +23,12 @@ struct Blob
    	int X;
    	int Y;
    	int Size;
-   	byte number;
 };
 
 class PVision
 {
 
 public:
-  	PVision();
-
 	void init();   // returns true if the connection to the sensor established correctly
 	byte read();   // updated the blobs, and returns the number of blobs detected
 
@@ -43,15 +40,9 @@ public:
 
 private:
   	// per object data
-	int IRsensorAddress;
-	int IRslaveAddress;
 	byte data_buf[16];
-	int i;
-	int s;
 
 	void Write_2bytes(byte d1, byte d2);
-	byte blobcount; // returns the number of blobs found - reads the sensor
-
 };
 
 // Arduino 0012 workaround

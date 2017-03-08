@@ -9,26 +9,17 @@
 #include "PVision.h"
 #include <Wire.h>
 
+#define SENSOR_ADDR 0xB0
+#define SLAVE_ADDR (SENSOR_ADDR >> 1)
+
 /******************************************************************************
 * Private methods
 ******************************************************************************/
 void PVision::Write_2bytes(byte d1, byte d2)
 {
-    Wire.beginTransmission(IRslaveAddress);
+    Wire.beginTransmission(SLAVE_ADDR);
     Wire.write(d1); Wire.write(d2);
     Wire.endTransmission();
-}
-
-
-/******************************************************************************
-* Constructor
-******************************************************************************/
-PVision::PVision()
-{
-	Blob1.number = 1;
-	Blob2.number = 2;
-	Blob3.number = 3;
-	Blob4.number = 4;
 }
 
 /******************************************************************************
@@ -37,9 +28,6 @@ PVision::PVision()
 // init the PVision sensor
 void PVision::init ()
 {
-    IRsensorAddress = 0xB0;
-    IRslaveAddress = IRsensorAddress >> 1;   // This results in 0x21 as the address to pass to TWI
-
     Wire.begin();
     // IR sensor initialize
     Write_2bytes(0x30,0x01); delay(10);
@@ -53,12 +41,16 @@ void PVision::init ()
 
 byte PVision::read()
 {
+	int i;
+	int s;
+	byte blobcount; // returns the number of blobs found - reads the sensor
+
     //IR sensor read
-    Wire.beginTransmission(IRslaveAddress);
+    Wire.beginTransmission(SLAVE_ADDR);
     Wire.write(0x36);
     Wire.endTransmission();
 
-    Wire.requestFrom(IRslaveAddress, 16);        // Request the 2 byte heading (MSB comes first)
+    Wire.requestFrom(SLAVE_ADDR, 16);        // Request the 2 byte heading (MSB comes first)
     for (i=0;i<16;i++)
     {
        data_buf[i]=0;

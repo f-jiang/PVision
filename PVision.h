@@ -17,7 +17,6 @@
 #define BLOB4 0x08
 
 
-// Returned structure from a call to readSample()
 struct Blob
 {
    	int X;

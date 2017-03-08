@@ -3,28 +3,12 @@
 // http://www.kako.com/neta/2007-001/2007-001.html
 
 // Steve Hobley 2009 - www.stephenhobley.com
-/******************************************************************************
-* Includes
-******************************************************************************/
 #include "PVision.h"
 #include <Wire.h>
 
 #define SENSOR_ADDR 0xB0
 #define SLAVE_ADDR (SENSOR_ADDR >> 1)
 
-/******************************************************************************
-* Private methods
-******************************************************************************/
-void PVision::Write_2bytes(byte d1, byte d2)
-{
-    Wire.beginTransmission(SLAVE_ADDR);
-    Wire.write(d1); Wire.write(d2);
-    Wire.endTransmission();
-}
-
-/******************************************************************************
-* Public methods
-******************************************************************************/
 // init the PVision sensor
 void PVision::init ()
 {
@@ -104,5 +88,12 @@ byte PVision::read()
     blobcount |= (Blob4.Size < 15)? BLOB4 : 0;
 
     return blobcount;
+}
+
+void PVision::Write_2bytes(byte d1, byte d2)
+{
+    Wire.beginTransmission(SLAVE_ADDR);
+    Wire.write(d1); Wire.write(d2);
+    Wire.endTransmission();
 }
 

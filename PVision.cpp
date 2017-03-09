@@ -3,97 +3,67 @@
 // http://www.kako.com/neta/2007-001/2007-001.html
 
 // Steve Hobley 2009 - www.stephenhobley.com
+
 #include "PVision.h"
+
+#include <Arduino.h>
 #include <Wire.h>
 
-#define SENSOR_ADDR 0xB0
-#define SLAVE_ADDR (SENSOR_ADDR >> 1)
-
-// init the PVision sensor
-void PVision::init ()
-{
+void PVision::Init() {
     Wire.begin();
-    // IR sensor initialize
-    Write_2bytes(0x30,0x01); delay(10);
-    Write_2bytes(0x30,0x08); delay(10);
-    Write_2bytes(0x06,0x90); delay(10);
-    Write_2bytes(0x08,0xC0); delay(10);
-    Write_2bytes(0x1A,0x40); delay(10);
-    Write_2bytes(0x33,0x33); delay(10);
+    WriteBytes(0x30, 0x01);
+    delay(10);
+    WriteBytes(0x30, 0x08);
+    delay(10);
+    WriteBytes(0x06, 0x90);
+    delay(10);
+    WriteBytes(0x08, 0xC0);
+    delay(10);
+    WriteBytes(0x1A, 0x40);
+    delay(10);
+    WriteBytes(0x33, 0x33);
+    delay(10);
     delay(100);
 }
 
-byte PVision::read()
-{
-	int i;
-	int s;
-	byte blobcount; // returns the number of blobs found - reads the sensor
+size_t PVision::Read() {
+    size_t blobCount = 0;
 
-    //IR sensor read
     Wire.beginTransmission(SLAVE_ADDR);
     Wire.write(0x36);
     Wire.endTransmission();
 
-    Wire.requestFrom(SLAVE_ADDR, 16);        // Request the 2 byte heading (MSB comes first)
-    for (i=0;i<16;i++)
-    {
-       data_buf[i]=0;
+    Wire.requestFrom(SLAVE_ADDR, BUF_SIZE);
+
+    size_t i;
+    for (i = 0; i < BUF_SIZE; i++) {
+        m_buf[i] = 0;
+    }
+    i = 0;
+    while (Wire.available() && i < BUF_SIZE) {
+        m_buf[i++] = Wire.Read();
     }
 
-    i=0;
+    unsigned char s;
+    for (i = 0; i < NBLOBS; i++) {
+        s = m_buf[i * 3 + 3];
+        m_blobs[i].x = m_buf[i * 3 + 1] + ((s & 0x30) << 4);
+        m_blobs[i].y = m_buf[i * 3 + 2] + ((s & 0xC0) << 2);
+        m_blobs[i].size = s & 0x0F;
 
-    while(Wire.available() && i < 16)
-    {
-        data_buf[i] = Wire.read();
-        i++;
+        if (m_blobs[i].size < 15) {
+            m_blobs[i].visible = true;
+            blobCount++;
+        }
     }
 
-    blobcount = 0;
-
-    Blob1.X = data_buf[1];
-    Blob1.Y = data_buf[2];
-    s   = data_buf[3];
-    Blob1.X += (s & 0x30) <<4;
-    Blob1.Y += (s & 0xC0) <<2;
-    Blob1.Size = (s & 0x0F);
-
-    // At the moment we're using the size of the blob to determine if one is detected, either X,Y, or size could be used.
-    blobcount |= (Blob1.Size < 15)? BLOB1 : 0;
-
-    Blob2.X = data_buf[4];
-    Blob2.Y = data_buf[5];
-    s   = data_buf[6];
-    Blob2.X += (s & 0x30) <<4;
-    Blob2.Y += (s & 0xC0) <<2;
-    Blob2.Size = (s & 0x0F);
-
-    blobcount |= (Blob2.Size < 15)? BLOB2 : 0;
-
-    Blob3.X = data_buf[7];
-    Blob3.Y = data_buf[8];
-    s   = data_buf[9];
-    Blob3.X += (s & 0x30) <<4;
-    Blob3.Y += (s & 0xC0) <<2;
-    Blob3.Size = (s & 0x0F);
-
-    blobcount |= (Blob3.Size < 15)? BLOB3 : 0;
-
-    Blob4.X = data_buf[10];
-    Blob4.Y = data_buf[11];
-    s   = data_buf[12];
-    Blob4.X += (s & 0x30) <<4;
-    Blob4.Y += (s & 0xC0) <<2;
-    Blob4.Size = (s & 0x0F);
-
-    blobcount |= (Blob4.Size < 15)? BLOB4 : 0;
-
-    return blobcount;
+    return blobCount;
 }
 
-void PVision::Write_2bytes(byte d1, byte d2)
-{
+void PVision::WriteBytes(unsigned char a, unsigned char b) {
     Wire.beginTransmission(SLAVE_ADDR);
-    Wire.write(d1); Wire.write(d2);
+    Wire.write(a);
+    Wire.write(b);
     Wire.endTransmission();
 }
 

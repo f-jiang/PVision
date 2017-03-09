@@ -4,44 +4,37 @@
 
 // Steve Hobley 2009 - www.stephenhobley.com
 
-#ifndef PVision_h
-#define PVision_h
+#ifndef PVISION_H
+#define PVISION_H
 
-#include <Arduino.h>
-#include <Wire.h>
+#include <stddef.h>
 
-// bit flags for blobs
-#define BLOB1 0x01
-#define BLOB2 0x02
-#define BLOB3 0x04
-#define BLOB4 0x08
+#define BUF_SIZE 16
+#define NBLOBS 4
+#define SENSOR_ADDR 0xB0
+#define SLAVE_ADDR (SENSOR_ADDR >> 1)
 
-
-struct Blob
-{
-   	int X;
-   	int Y;
-   	int Size;
-};
-
-class PVision
-{
-
+class PVision {
 public:
-	void init();   // returns true if the connection to the sensor established correctly
-	byte read();   // updated the blobs, and returns the number of blobs detected
+    struct Blob {
+        int x;
+        int y;
+        size_t size;
+        bool visible;
+    };
 
-	// Make these public
-	Blob Blob1;
-	Blob Blob2;
-	Blob Blob3;
-	Blob Blob4;
+    void Init();
+    size_t Read();
+
+    const Blob& operator[](size_t n) const {
+        return m_blobs[n];
+    }
 
 private:
-  	// per object data
-	byte data_buf[16];
+    unsigned char m_buf[BUF_SIZE];
+    Blob m_blobs[NBLOBS];
 
-	void Write_2bytes(byte d1, byte d2);
+    void WriteBytes(unsigned char, unsigned char);
 };
 
 // Arduino 0012 workaround
@@ -54,3 +47,4 @@ private:
 #undef round
 
 #endif
+

@@ -19,6 +19,8 @@ public:
     struct Blob {
         int x;
         int y;
+        int dtx;
+        int dty;
         size_t size;
         bool visible;
     };

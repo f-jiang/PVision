@@ -45,10 +45,17 @@ size_t PVision::Read() {
     }
 
     unsigned char s;
+    int prevX, prevY;
     for (i = 0; i < NBLOBS; i++) {
         s = m_buf[i * 3 + 3];
+
+        prevX = m_blobs[i].x;
+        prevY = m_blobs[i].y;
         m_blobs[i].x = m_buf[i * 3 + 1] + ((s & 0x30) << 4);
         m_blobs[i].y = m_buf[i * 3 + 2] + ((s & 0xC0) << 2);
+        m_blobs[i].dtx = m_blobs[i].x - prevX;
+        m_blobs[i].dty = m_blobs[i].y - prevY;
+
         m_blobs[i].size = s & 0x0F;
 
         if (m_blobs[i].size < 15) {

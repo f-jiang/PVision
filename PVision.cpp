@@ -61,6 +61,8 @@ size_t PVision::Read() {
         if (m_blobs[i].size < 15) {
             m_blobs[i].visible = true;
             blobCount++;
+        } else {
+            m_blobs[i].visible = false;
         }
     }
 

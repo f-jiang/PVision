@@ -41,7 +41,7 @@ size_t PVision::Read() {
     }
     i = 0;
     while (Wire.available() && i < BUF_SIZE) {
-        m_buf[i++] = Wire.Read();
+        m_buf[i++] = Wire.read();
     }
 
     unsigned char s;

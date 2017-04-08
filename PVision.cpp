@@ -48,9 +48,9 @@ size_t PVision::Read() {
     int prevX, prevY;
     for (i = 0; i < NBLOBS; i++) {
         s = m_buf[i * 3 + 3];
-        m_blobs[i].size = s & 0x0F;
+        m_blobs[i].dist = s & 0x0F;
 
-        if (m_blobs[i].size < 15) {
+        if (m_blobs[i].dist < 15) {
             m_blobs[i].visible = true;
             blobCount++;
 

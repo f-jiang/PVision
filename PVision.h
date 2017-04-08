@@ -21,7 +21,7 @@ public:
         int y;
         int dtx;
         int dty;
-        size_t size;
+        size_t dist;
         bool visible;
     };
 

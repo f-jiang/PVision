@@ -9,6 +9,10 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#define SENSOR_ADDR 0xB0
+#define SLAVE_ADDR (SENSOR_ADDR >> 1)
+#define MAX_BLOB_DIST 15
+
 void PVision::Init() {
     Wire.begin();
     WriteBytes(0x30, 0x01);
@@ -50,7 +54,7 @@ size_t PVision::Read() {
         s = m_buf[i * 3 + 3];
         m_blobs[i].dist = s & 0x0F;
 
-        if (m_blobs[i].dist < 15) {
+        if (m_blobs[i].dist < MAX_BLOB_DIST) {
             m_blobs[i].visible = true;
             blobCount++;
 

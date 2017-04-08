@@ -11,8 +11,6 @@
 
 #define BUF_SIZE 16
 #define NBLOBS 4
-#define SENSOR_ADDR 0xB0
-#define SLAVE_ADDR (SENSOR_ADDR >> 1)
 
 class PVision {
 public:
